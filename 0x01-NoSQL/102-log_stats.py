@@ -30,7 +30,6 @@ if __name__ == "__main__":
     nginx_col = client.logs.nginx
 
     print("{} logs".format(nginx_col.count_documents({})))
-    print("{}".format(nginx_col.find()[0]))
     print("Methods:")
     method = ["GET", "POST", "PUT", "PATCH", "DELETE"]
     for meth in method:
