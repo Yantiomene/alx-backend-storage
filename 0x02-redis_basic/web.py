@@ -11,6 +11,7 @@ from functools import wraps
 from typing import Callable
 
 r = redis.Redis()
+EXPIRATION_TIME = 10
 
 
 def count_url_access(fn: Callable) -> Callable:
@@ -26,7 +27,7 @@ def count_url_access(fn: Callable) -> Callable:
         url_key = "count:" + url
         html_content = fn(url)
         r.incr(url_key)
-        r.setex(key, 10, html_content)
+        r.setex(key, EXPIRATION_TIME, html_content)
 
         return html_content
 
@@ -44,4 +45,4 @@ def get_page(url: str) -> str:
 
 if __name__ == "__main__":
     url = 'http://slowwly.robertomurray.co.uk'
-    get_page(url)
+    print(get_page(url))
