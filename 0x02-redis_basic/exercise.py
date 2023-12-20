@@ -6,6 +6,35 @@ import uuid
 from functools import wraps
 
 
+def replay(method: Callable) -> None:
+    """Display the history of calls of a particular function"""
+
+    r = redis.Redis()
+    name = method.__qualname__
+    count = r.get(name)
+    try:
+        count = int(count.decode("utf-8"))
+    except Exception:
+        count = 0
+
+    print("{} was called {} times:".format(name, count))
+    inputs = r.lrange("{}:inputs".format(name), 0, -1)
+    outputs = r.lrange("{}:outputs".format(name), 0, -1)
+
+    for inp, out in zip(inputs, outputs):
+        try:
+            inp = inp.decode("utf-8")
+        except Exception:
+            inp = ""
+
+        try:
+            out = out.decode("utf-8")
+        except Exception:
+            out = ""
+
+        print("{}(*{}) -> {}".format(name, inp, out))
+
+
 def call_history(method: Callable) -> Callable:
     """Decorator to store hsitory of inputs and outputs"""
 
